@@ -19,10 +19,10 @@
     <!-- 启动 ROS 相机标定工具 -->
     <!--
         使用方法：
-        1. 运行本 launch：roslaunch radar_obstacle_avoidance camera_intrinsic_calibration.launch
-        2. 在另一个终端运行：rosrun camera_calibration cameracalibrator.py \
-             --size 9x6 --square 0.108 \
-             image:=/camera/image_raw camera:=/camera
+        1. 运行本 launch 启动相机和标定板检测
+        2. 在另一个终端运行:
+           rosrun camera_calibration cameracalibrator.py size 9x6 square 0.108 \
+               image:=/camera/image_raw camera:=/camera
 
         需要同时满足：
             - 标定板在图像中清晰可见
@@ -30,7 +30,7 @@
             - 至少采集 20-30 帧
 
         标定完成后：
-            - 点击 "Save" 保存 calibrationdata.tar.gz
+            - 点击 Save 保存 calibrationdata.tar.gz
             - 解压后提取 ost.yaml 和 ost.txt
             - 将内参填入 config/camera_config.yaml 的 intrinsic 字段
     -->

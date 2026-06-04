@@ -1,0 +1,41 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+  - Class: rviz/Views
+    Name: Views
+Visualization Manager:
+  Displays:
+    - Class: rviz/Grid
+      Name: Grid
+    - Alpha: 0.7
+      Class: rviz/PointCloud2
+      Color Transformer: AxisColor
+      Enabled: true
+      Name: LiDAR Cloud
+      Topic: /fast_livo/cloud_registered
+    - Alpha: 0.5
+      Class: rviz/Map
+      Enabled: true
+      Name: ESDF Slice
+      Topic: /fiesta/ESDFMap/slice
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Name: Obstacles 3D
+      Topic: /fusion/markers
+    - Class: rviz/Marker
+      Enabled: true
+      Name: Calibration Result
+      Topic: /calib_result
+  Global Options:
+    Fixed Frame: camera_init
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 20
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Name: Current View
+      Pitch: 0.5
+      Yaw: 0.5

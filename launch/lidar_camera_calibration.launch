@@ -45,7 +45,7 @@
 
     <!-- RViz 可视化（查看标定结果） -->
     <node name="rviz" pkg="rviz" type="rviz" output="screen"
-          args="-d $(find radar_obstacle_avoidance)/config/fiesta_view.rviz"
+          args="-d $(find radar_obstacle_avoidance)/rviz/fiesta_view.rviz"
           required="false" />
 
 </launch>

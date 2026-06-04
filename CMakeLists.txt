@@ -20,7 +20,11 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   geodesy
   serial
-)
+  )
+
+# Python 运行时依赖 (不需 CMake find_package):
+ #   vision_msgs  (ROS standard package: ros-noetic-vision-msgs)
+ #   norfair       (pip3 install norfair)
 
 find_package(PCL 1.8 REQUIRED)
 find_package(Eigen3 REQUIRED)
