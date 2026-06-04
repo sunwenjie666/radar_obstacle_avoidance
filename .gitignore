@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# ROS build artifacts
+devel/
+build/
+install/
+*.cmake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+catkin_generated/
+env.sh
+setup.*.sh
+setup.bash
+setup.zsh
+_setup_util.py
+*.catkin
+*.pc
+*.include
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large model/weight files (download separately, but keep models/*)
+*.weights
+*.pt
+*.pth
+*.engine
+
+# Bag files
+*.bag
+*.bag.active
+
+# Logs
+*.log

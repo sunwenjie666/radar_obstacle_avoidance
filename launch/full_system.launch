@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 系统参数 -->
+    <arg name="enable_auto_remap" default="true"/>
+    <arg name="enable_path_planning" default="true"/>
+    <arg name="enable_rtk" default="true"/>
+    <arg name="map_resolution" default="0.1"/>
+    <arg name="enable_vision" default="true" />
+    <arg name="enable_esdf_bridge" default="true" doc="将BEV障碍物注入FIESTA ESDF" />
+
+    <!-- 启动雷达驱动和FAST-LIVO2 -->
+    <include file="$(find radar_obstacle_avoidance)/launch/radar_processor.launch"/>
+
+    <!-- 启动RTK-GPS（如果启用） -->
+    <group if="$(arg enable_rtk)">
+        <include file="$(find radar_obstacle_avoidance)/launch/rtk_gps.launch"/>
+    </group>
+
+    <!-- 加载重新建图配置 -->
+    <rosparam command="load"
+              file="$(find radar_obstacle_avoidance)/config/remap_config.yaml"/>
+
+    <!-- 启动重新建图管理器 -->
+    <node name="remap_manager" pkg="radar_obstacle_avoidance"
+          type="remap_manager_node" output="screen">
+        <param name="enable_auto_remap" value="$(arg enable_auto_remap)"/>
+        <param name="map_resolution" value="$(arg map_resolution)"/>
+    </node>
+
+    <!-- 启动系统监控 -->
+    <node name="system_monitor" pkg="radar_obstacle_avoidance"
+          type="system_monitor_node" output="screen"/>
+
+    <!-- 启动视觉系统（如果启用） -->
+    <group if="$(arg enable_vision)">
+        <include file="$(find radar_obstacle_avoidance)/launch/vision_system.launch">
+            <arg name="enable_camera" value="true"/>
+            <arg name="camera_type" value="usb_cam"/>
+            <arg name="enable_yolo" value="true"/>
+            <arg name="enable_tracking" value="true"/>
+            <arg name="enable_fusion" value="true"/>
+        </include>
+    </group>
+
+    <!-- RVIZ可视化 -->
+    <node name="rviz" pkg="rviz" type="rviz"
+          args="-d $(find radar_obstacle_avoidance)/rviz/full_system.rviz"/>
+
+    <!-- 启动点云转发节点 -->
+    <node name="pointcloud_relay" pkg="radar_obstacle_avoidance" type="pointcloud_relay" output="screen"/>
+
+    <!-- ESDF Bridge: 将BEV障碍物注入点云流供FIESTA使用 -->
+    <group if="$(arg enable_esdf_bridge)">
+        <node name="fiesta_esdf_bridge" pkg="radar_obstacle_avoidance"
+              type="fiesta_bridge_node.py" output="screen">
+            <param name="points_per_m3" value="20.0" />
+            <param name="max_inject_points" value="800" />
+            <param name="min_confidence" value="0.35" />
+            <param name="min_lidar_points" value="3" />
+        </node>
+    </group>
+
+    <!-- FIESTA ESDF 建图 -->
+    <!-- 订阅 /fusion/injected_cloud（含虚拟障碍物点） -->
+    <include file="$(find fiesta)/launch/cow_and_lady.launch">
+        <!-- 将 FIESTA 的 ~depth 指向注入后的点云 -->
+        <remap from="~depth" to="/fusion/injected_cloud"/>
+    </include>
+
+    <!-- FIESTA 位姿输入（无MAVROS时使用静态位姿） -->
+    <node name="static_tf_fallback" pkg="radar_obstacle_avoidance"
+          type="static_tf_fallback.py" output="screen"
+          if="$(eval not enable_rtk)"/>
+
+</launch>

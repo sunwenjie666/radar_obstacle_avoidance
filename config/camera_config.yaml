@@ -1,0 +1,45 @@
+# 相机配置
+# 内参标定后请更新 intrinsic 和 extrinsic 字段
+camera:
+  driver: "usb_cam"  # 或 "realsense"
+
+  # USB 相机配置
+  usb_cam:
+    device: "/dev/video0"
+    width: 640
+    height: 480
+    framerate: 30
+    pixel_format: "yuyv"
+
+  # RealSense 配置（未来使用）
+  realsense:
+    serial_number: ""
+    width: 640
+    height: 480
+    fps: 30
+    enable_depth: true
+    depth_width: 424
+    depth_height: 240
+
+  # 相机内参（使用 camera_calibration 标定后填入）
+  # 标定方法: rosrun camera_calibration cameracalibrator.py
+  intrinsic:
+    fx: 615.0     # 焦距 x (像素)
+    fy: 615.0     # 焦距 y (像素)
+    cx: 320.0     # 主点 x (像素)
+    cy: 240.0     # 主点 y (像素)
+    width: 640
+    height: 480
+    distortion_model: "plumb_bob"
+    D: [0.0, 0.0, 0.0, 0.0, 0.0]   # 畸变系数 [k1, k2, p1, p2, k3]
+    K: [615.0, 0.0, 320.0,
+         0.0, 615.0, 240.0,
+         0.0, 0.0, 1.0]             # 内参矩阵 (行优先)
+    R: [1.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 0.0, 1.0]             # 校正矩阵
+
+  # LiDAR→相机 外参（使用 calibrate_camera_lidar.py 标定后填入）
+  extrinsic:
+    translation: [0.0, 0.0, 0.0]     # x, y, z (米)
+    rotation: [0.0, 0.0, 0.0, 1.0]   # 四元数 x, y, z, w

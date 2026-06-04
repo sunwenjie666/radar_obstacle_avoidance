@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 视觉系统参数 -->
+    <arg name="enable_camera" default="true" />
+    <arg name="camera_type" default="usb_cam" /> <!-- realsense or usb_cam -->
+    <arg name="enable_yolo" default="true" />
+    <arg name="enable_tracking" default="true" />
+    <arg name="enable_fusion" default="true" />
+    <arg name="fusion_mode" default="bev" /> <!-- legacy or bev -->
+    <arg name="enable_bev_visualizer" default="false" />
+
+    <!-- 加载相机配置 -->
+    <rosparam command="load"
+              file="$(find radar_obstacle_avoidance)/config/camera_config.yaml" />
+
+    <!-- 加载 BEV 融合配置到节点私有命名空间 -->
+    <rosparam command="load" ns="bev_fusion_node"
+              file="$(find radar_obstacle_avoidance)/config/bev_fusion.yaml" />
+
+    <!-- 启动相机驱动 -->
+    <group if="$(arg enable_camera)">
+        <group if="$(eval camera_type == 'realsense')">
+            <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+                <arg name="align_depth" value="true" />
+                <arg name="filters" value="pointcloud" />
+                <arg name="enable_sync" value="true" />
+            </include>
+        </group>
+
+        <group if="$(eval camera_type == 'usb_cam')">
+            <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+                <param name="video_device" value="/dev/video0" />
+                <param name="image_width" value="640" />
+                <param name="image_height" value="480" />
+                <param name="pixel_format" value="yuyv" />
+                <param name="camera_frame_id" value="camera" />
+                <param name="io_method" value="mmap" />
+            </node>
+        </group>
+    </group>
+
+    <!-- 启动YOLO检测节点 -->
+    <group if="$(arg enable_yolo)">
+        <node name="yolo_detector" pkg="radar_obstacle_avoidance"
+              type="yolo_detector_node.py" output="screen">
+            <param name="model_path"
+                   value="$(find radar_obstacle_avoidance)/models/best.onnx" />
+            <param name="conf_threshold" value="0.5" />
+            <param name="iou_threshold" value="0.45" />
+            <param name="input_size" value="640" />
+        </node>
+    </group>
+
+    <!-- 启动目标跟踪节点 (norfair + Kalman Filter) -->
+    <group if="$(arg enable_tracking)">
+        <node name="object_tracker" pkg="radar_obstacle_avoidance"
+              type="object_tracker_node.py" output="screen">
+            <param name="distance_threshold" value="38" />
+            <param name="hit_counter_max" value="20" />
+            <param name="initialization_delay" value="3" />
+        </node>
+    </group>
+
+    <!-- 启动融合节点 (BEV模式) -->
+    <group if="$(arg enable_fusion)">
+        <group if="$(eval fusion_mode == 'bev')">
+            <!-- BEV Fusion 节点 (默认) -->
+            <node name="bev_fusion" pkg="radar_obstacle_avoidance"
+                  type="bev_fusion_node.py" output="screen" />
+
+            <!-- BEV 可视化 (调试用) -->
+            <group if="$(arg enable_bev_visualizer)">
+                <node name="bev_visualizer" pkg="radar_obstacle_avoidance"
+                      type="bev_visualizer.py" output="screen" />
+            </group>
+        </group>
+
+        <group if="$(eval fusion_mode == 'legacy')">
+            <!-- 旧版融合节点 (对比用) -->
+            <node name="sensor_fusion" pkg="radar_obstacle_avoidance"
+                  type="sensor_fusion_node.py" output="screen">
+                <param name="fusion_rate" value="10.0" />
+            </node>
+        </group>
+    </group>
+
+</launch>

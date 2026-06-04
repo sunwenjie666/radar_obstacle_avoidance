@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 加载RTK参数 -->
+    <rosparam command="load" 
+              file="$(find radar_obstacle_avoidance)/config/rtk_gps.yaml"/>
+    
+    <!-- 启动RTK-GPS节点 -->
+    <node name="rtk_gps_node" pkg="radar_obstacle_avoidance" 
+          type="rtk_gps_node" output="screen" respawn="true">
+        <param name="serial_port" value="/dev/ttyACM0"/>
+        <param name="baud_rate" value="115200"/>
+        <param name="enable_pps" value="true"/>
+    </node>
+    
+    <!-- 启动时间同步节点 -->
+    <node name="time_sync_node" pkg="radar_obstacle_avoidance"
+          type="time_sync_node" output="screen">
+        <param name="use_utm" value="true"/>
+        <param name="max_time_diff" value="0.1"/>
+    </node>
+    
+    <!-- 启动特征检测节点 -->
+    <node name="feature_detector" pkg="radar_obstacle_avoidance" 
+          type="feature_detector_node" output="screen"/>
+    
+</launch>

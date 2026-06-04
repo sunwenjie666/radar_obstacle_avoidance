@@ -1,0 +1,10 @@
+Header header
+bool remap_trigger
+string trigger_reason
+float64 origin_latitude
+float64 origin_longitude
+float64 origin_altitude
+float32 origin_heading
+float32 position_accuracy
+float32 map_resolution
+string map_frame_id

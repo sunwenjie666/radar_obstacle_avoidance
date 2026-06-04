@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 启动 HesaiLidar_ROS_2.0 驱动 -->
+    <node name="hesai_lidar" pkg="hesai_ros_driver" type="hesai_ros_driver_node" output="screen">
+        <param name="config_file" value="$(find radar_obstacle_avoidance)/config/hesai_config.yaml"/>
+    </node>
+    
+    <!-- 启动 FAST-LIVO2 -->
+    <include file="$(find fast_livo)/launch/mapping_avia.launch">
+        <arg name="rviz" value="false"/>
+    </include>
+    
+    <!-- 启动点云处理器 -->
+    <node name="pointcloud_processor" pkg="radar_obstacle_avoidance" 
+          type="pointcloud_processor" output="screen">
+        <param name="enable_visualization" value="true"/>
+    </node>
+    
+</launch>

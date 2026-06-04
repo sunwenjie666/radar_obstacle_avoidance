@@ -1,0 +1,48 @@
+# BEV融合节点参数 (加载到 bev_fusion_node 私有命名空间)
+# 适用于 Jetson Orin NX 8GB
+
+# ==== BEV参数 ====
+local_bev_size: 20.0         # 局部BEV尺寸 (米)，每个检测框独立生成
+bev_resolution: 0.2          # BEV网格分辨率 (米)，20m/0.2m = 100x100网格
+max_detections: 20           # 每帧最大检测数
+
+# ==== 点云预处理 ====
+downsample_voxel: 0.1        # 体素滤波下采样 (米)
+max_range: 80.0              # 最大有效距离 (米)
+min_range: 0.5               # 最小有效距离 (米)
+roi_margin: 50               # 检测框ROI边距 (像素)
+
+# ==== 软关联参数 ====
+soft_alpha: 0.5              # 图像空间距离权重
+soft_beta: 0.3               # 3D空间距离权重
+soft_gamma: 0.2              # 检测置信度权重
+sigma_img: 50.0              # 图像空间高斯sigma (像素)
+sigma_3d: 2.0                # 3D空间高斯sigma (米)
+min_assoc_points: 3          # 最小关联点数，低于此值跳过
+
+# ==== 交叉注意力参数 ====
+attention_enable: true       # 是否启用交叉注意力
+attention_d_model: 32        # 特征维度
+attention_radius: 5.0        # 局部注意力半径 (米)
+attention_min_points: 5      # 最少点数量，低于此值降级为均值
+
+# ==== 深度估计 ====
+depth_method: "weighted_mean"    # 方法: min / mean / weighted_mean / attention
+
+# ==== 障碍物过滤 ====
+min_confidence: 0.35         # 最小检测置信度
+min_box_area: 200            # 最小检测框面积 (像素²)
+
+# ==== 可视化 ====
+publish_bev_image: true      # 发布BEV可视化图像
+publish_markers: true        # 发布MarkerArray到RViz
+
+# ==== 相机-LiDAR外参 (标定后填入) ====
+calibration:
+  translation_x: 0.0
+  translation_y: 0.0
+  translation_z: 0.0
+  quaternion_x: 0.0
+  quaternion_y: 0.0
+  quaternion_z: 0.0
+  quaternion_w: 1.0

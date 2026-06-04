@@ -1,0 +1,30 @@
+rtk_gps:
+  serial_port: "/dev/ttyACM0"
+  baud_rate: 115200
+  timeout: 1000
+  enable_pps: true
+  pps_device: "/dev/pps0"
+  min_fix_quality: 4
+  min_satellites: 8
+  max_hdop: 2.0
+  hdop_to_accuracy: 2.5
+  publish_rate: 10
+  status_rate: 2
+  record_on_event: true
+  min_event_accuracy: 0.05
+  event_buffer_size: 10
+
+time_sync:
+  max_time_diff: 0.1
+  use_approximate_sync: true
+  queue_size: 10
+  use_utm: true
+  force_utm_zone: ""
+
+transform:
+  publish_tf: true
+  map_frame: "map"
+  odom_frame: "odom"
+  base_frame: "base_link"
+  rtk_frame: "rtk_gps"
+  utm_frame: "utm"

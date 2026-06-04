@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 相机-LiDAR 外参标定
+         使用方法:
+         1. 硬件就绪后运行: roslaunch radar_obstacle_avoidance lidar_camera_calibration.launch
+         2. 将棋盘格放在相机+LiDAR共同视野中
+         3. 每检测到棋盘格会显示绿色LiDAR点
+         4. 收集至少15个不同位姿后, 在标定窗口按 'c' 计算
+         5. 按 'q' 退出
+
+         标定板参数:
+           - 推荐 9x6 内角点, 边长108mm 棋盘格
+           - 确保标定板平整, 不反光
+    -->
+
+    <!-- 标定板参数 -->
+    <arg name="checkerboard_rows" default="9" />
+    <arg name="checkerboard_cols" default="6" />
+    <arg name="square_size" default="0.108" doc="棋盘格方格边长 (米)" />
+    <arg name="min_frames" default="15" />
+
+    <!-- 加载相机内参（必须已标定） -->
+    <rosparam command="load"
+              file="$(find radar_obstacle_avoidance)/config/camera_config.yaml" />
+
+    <!-- 启动相机（如果尚未启动） -->
+    <include file="$(find radar_obstacle_avoidance)/launch/vision_system.launch"
+             pass_all_args="false">
+        <arg name="enable_camera" value="true" />
+        <arg name="camera_type" value="usb_cam" />
+        <arg name="enable_yolo" value="false" />
+        <arg name="enable_tracking" value="false" />
+        <arg name="enable_fusion" value="false" />
+    </include>
+
+    <!-- 外参标定节点 -->
+    <node name="camera_lidar_calibrator" pkg="radar_obstacle_avoidance"
+          type="calibrate_camera_lidar.py" output="screen">
+        <param name="mode" value="live" />
+        <param name="checkerboard_rows" value="$(arg checkerboard_rows)" />
+        <param name="checkerboard_cols" value="$(arg checkerboard_cols)" />
+        <param name="square_size" value="$(arg square_size)" />
+        <param name="min_frames" value="$(arg min_frames)" />
+    </node>
+
+    <!-- RViz 可视化（查看标定结果） -->
+    <node name="rviz" pkg="rviz" type="rviz" output="screen"
+          args="-d $(find radar_obstacle_avoidance)/config/fiesta_view.rviz"
+          required="false" />
+
+</launch>

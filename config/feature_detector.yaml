@@ -1,0 +1,12 @@
+feature_detector:
+  voxel_size: 0.1
+  k_search: 30
+  entropy_threshold: 1.5
+  curvature_threshold: 0.05
+  planarity_threshold: 0.5
+  linearity_threshold: 0.3
+  sliding_window_size: 100
+  min_feature_points: 100
+  enable_debug: true
+  publish_markers: true
+  save_debug_data: false

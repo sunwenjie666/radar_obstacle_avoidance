@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 相机内参标定：使用棋盘格标定板标定相机内参和畸变系数 -->
+
+    <!-- 标定板参数 (根据实际标定板修改) -->
+    <arg name="board_width" default="9" doc="棋盘格内角点列数" />
+    <arg name="board_height" default="6" doc="棋盘格内角点行数" />
+    <arg name="square_size" default="0.108" doc="棋盘格方格边长 (米)" />
+
+    <!-- 启动相机（如果尚未启动） -->
+    <include file="$(find radar_obstacle_avoidance)/launch/vision_system.launch"
+             pass_all_args="false">
+        <arg name="enable_camera" value="true" />
+        <arg name="enable_yolo" value="false" />
+        <arg name="enable_tracking" value="false" />
+        <arg name="enable_fusion" value="false" />
+    </include>
+
+    <!-- 启动 ROS 相机标定工具 -->
+    <!--
+        使用方法：
+        1. 运行本 launch：roslaunch radar_obstacle_avoidance camera_intrinsic_calibration.launch
+        2. 在另一个终端运行：rosrun camera_calibration cameracalibrator.py \
+             --size 9x6 --square 0.108 \
+             image:=/camera/image_raw camera:=/camera
+
+        需要同时满足：
+            - 标定板在图像中清晰可见
+            - 覆盖不同角度、不同距离、不同位置
+            - 至少采集 20-30 帧
+
+        标定完成后：
+            - 点击 "Save" 保存 calibrationdata.tar.gz
+            - 解压后提取 ost.yaml 和 ost.txt
+            - 将内参填入 config/camera_config.yaml 的 intrinsic 字段
+    -->
+
+    <!-- 提示信息 -->
+    <node name="calibration_info" pkg="rostopic" type="rostopic"
+          args="echo /camera/camera_info -n 1"
+          output="screen" />
+
+</launch>

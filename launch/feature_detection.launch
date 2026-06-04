@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 启动雷达驱动和 FAST-LIVO2 -->
+    <include file="$(find radar_obstacle_avoidance)/launch/radar_processor.launch"/>
+    
+    <!-- 加载特征检测参数 -->
+    <rosparam command="load" 
+              file="$(find radar_obstacle_avoidance)/config/feature_detector.yaml"/>
+    
+    <!-- 启动特征检测节点 -->
+    <node name="feature_detector" pkg="radar_obstacle_avoidance" 
+          type="feature_detector_node" output="screen">
+        <param name="voxel_size" value="0.1"/>
+        <param name="entropy_threshold" value="1.5"/>
+        <param name="enable_debug" value="true"/>
+    </node>
+
+</launch>
